@@ -1,74 +1,47 @@
-# Previsão da Carga Máxima Diária do Paraná e Relação entre Clima, Demanda e Interrupções no Fornecimento
+# Carga do subsistema Sul e interrupções da Copel no Paraná
 
-**Disciplina:** Ciência de Dados — UTFPR  
-**Professor:** Prof. Dr. Eduardo Pena  
-**Integrantes:** Kalil Nege (RA 2409020); [demais integrantes]  
-**Documento da Proposta (Google Docs):** [Acessar Documento](https://docs.google.com/document/d/19r2d1naF1CqVDHZCL37abtJKSbo9_XD1qQugRQb1pfg/edit)  
-**Proposta em PDF (1–2 páginas):** [`docs/proposta_etapa1.pdf`](docs/proposta_etapa1.pdf)
+Ciência de Dados · UTFPR · Prof. Eduardo Pena
+Daniel Suzuki Naves (RA 2363062), João Pedro Novais Zanusso (RA 2607743) e Kalil Nege (RA 2409020).
 
----
+A Etapa 2 prepara duas bases diárias entre 01/01/2022 e 16/11/2026. A curva horária original do ONS reúne PR, SC e RS no subsistema Sul. Esse é o recorte para prever o maior valor horário da carga do dia seguinte. A investigação de interrupções usa outra escala: acompanha, no Paraná, os dias em que um mesmo conjunto elétrico da Copel registra interrupções não programadas.
 
-## 1. Visão Geral do Projeto
+## Executar
 
-Este projeto investiga o comportamento da demanda e do fornecimento de energia elétrica no Paraná a partir de duas frentes:
+Com Python 3.10 e cerca de 4 GB livres, a partir da raiz do repositório:
 
-1. **Frente Preditiva (P1):** Previsão da carga máxima diária (MW) do subsistema Paraná com antecedência de um dia (horizonte D+1), comparando modelos supervisionados e baselines temporais sob três cenários de informação climática.
-2. **Frente Explicativa/Associativa (P2):** Análise da relação entre extremos meteorológicos, picos de consumo e frequência/duração de interrupções no fornecimento da Copel Distribuição, avaliando se esse padrão mudou após a privatização (agosto de 2023).
-
----
-
-## 2. Perguntas de Pesquisa e Hipóteses
-
-### Perguntas de Pesquisa
-- **P1:** É possível prever a carga máxima diária do Paraná em D+1 com erro menor que baselines históricos, utilizando variáveis de clima e calendário?
-- **P2:** Dias de clima extremo ou de alta demanda concentram mais interrupções na rede de distribuição? Essa relação se alterou após agosto de 2023?
-
-### Hipóteses
-- **H1:** A carga máxima diária tem relação não linear em formato de "U" com a temperatura (mínimo em temperaturas amenas e aumentos tanto no frio quanto no calor).
-- **H2:** Feriados, dias pontes e recesso de fim de ano reduzem significativamente a carga máxima diária em relação a dias úteis comparáveis.
-- **H3:** Chuva intensa e rajadas fortes de vento concentram maior volume de interrupções e de consumidores afetados.
-- **H4 (Exploratória):** A sensibilidade das interrupções a extremos climáticos difere antes e depois de agosto de 2023 (análise associativa, controlando por fatores regulatórios e sazonais).
-
----
-
-## 3. Fontes de Dados
-
-- **ONS:** Carga verificada semi-horária por área de carga (`PR`), 2016–2026.
-- **Open-Meteo ERA5:** Reanálise climática diária e horária para Curitiba, Londrina, Maringá, Cascavel e Ponta Grossa.
-- **Open-Meteo Historical Forecast:** Hindcast de previsões numéricas operacionais (a partir de 2021) para o cenário de previsão D+1.
-- **ANEEL:** Microdados de interrupções por ocorrência (2017–2025) e indicadores DEC/FEC por conjunto elétrico (2010–2025) na área de concessão da Copel.
-- **ONS CIPER:** Indicador de interrupções na rede de transmissão do Paraná.
-- **Feriados:** Biblioteca `holidays` complementada com Carnaval, Corpus Christi, pontes e recesso de fim de ano.
-
----
-
-## 4. Estrutura do Repositório
-
-```text
-├── README.md
-├── .gitignore
-├── docs/
-│   ├── proposta_etapa1.pdf
-│   ├── proposta_etapa1.md
-│   ├── proposta_etapa1.tex
-│   └── especificacao_projeto.pdf
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-└── src/
-    ├── data/
-    ├── features/
-    ├── models/
-    └── utils/
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
----
+Abra o [notebook da Etapa 2](notebooks/01_preparacao_dados.ipynb), selecione o kernel da `.venv` e execute as células em ordem. A primeira execução baixa os originais para `data/raw/`. As seguintes reutilizam esses arquivos. Os módulos em `src/` fazem a coleta, o tratamento, a integração e as verificações.
 
-## 5. Etapas de Desenvolvimento
+## Bases finais
 
-- **Etapa 1:** Definição do problema e proposta de projeto.
-- **Etapa 2:** Coleta, limpeza e integração dos dados (base final em Parquet).
-- **Etapa 3:** Análise exploratória, consultas SQL e testes de hipóteses.
-- **Etapa 4:** Modelagem preditiva, validação temporal e avaliação de erros.
-- **Etapa 5:** Relatório técnico, apresentação e repositório final.
+Os Parquets são gerados localmente em `data/processed/` e ficam fora do Git.
+
+| Arquivo | Cada linha representa | Medida principal |
+|---|---|---|
+| `carga_sul_d1.parquet` | Um dia de origem D | `carga_max_sul_d1_mwmed` é o máximo das 24 leituras horárias do Sul no dia civil D+1. |
+| `interrupcoes_nao_programadas_conjunto_dia.parquet` | Um conjunto elétrico com algum registro no dia | `interrupcoes_nao_programadas` conta os IDs distintos de interrupções não programadas iniciadas no conjunto naquele dia. |
+
+A mesma pasta contém os microdados filtrados, a integração estadual de conferência, a cobertura mensal e o manifesto com hashes dos originais. Uma nova coleta pode trazer revisões publicadas pelas fontes.
+
+## Fontes e decisões
+
+| Fonte | Uso na Etapa 2 |
+|---|---|
+| [ONS · Curva de carga](https://dados.ons.org.br/dataset/curva-carga) | Agregamos os CSVs horários do Sul por dia. Exigimos 24 horas distintas com carga válida para calcular a média e o máximo. Uma lacuna no dia previsto deixa o alvo ausente. |
+| [ANEEL · Interrupções na distribuição](https://dadosabertos.aneel.gov.br/dataset/interrupcoes-de-energia-eletrica-nas-redes-de-distribuicao) | Filtramos a Copel Distribuição pelo CNPJ `04368898000106`. A recorrência conta dias com ao menos uma interrupção não programada por conjunto. |
+| [ANEEL · Ocorrências emergenciais](https://dadosabertos.aneel.gov.br/dataset/ocorrencias-emergenciais-nas-redes-de-distribuicao) | Contamos os registros de atendimento pela data de abertura. Eles entram como série separada na integração estadual. |
+| [Open-Meteo · ERA5](https://open-meteo.com/en/docs/historical-weather-api) | Calculamos médias simples para Curitiba, Londrina, Maringá, Cascavel e Ponta Grossa. Preservamos também os máximos espaciais de chuva e rajada. O agregado exige os cinco pontos completos. |
+| Calendário · biblioteca `holidays` | Para carga, usamos os feriados nacionais e estaduais de PR, SC e RS na data prevista. Para os conjuntos da Copel, usamos o calendário do Paraná na data da interrupção. |
+
+Na ANEEL, removemos duplicatas exatas e preservamos chaves repetidas com conteúdo diferente. Adaptamos os campos que mudaram em 2026 e mantemos o esquema de origem. A duração é atribuída ao dia de início. Durações negativas e quantidades inválidas ficam fora das respectivas medidas. Durações acima de sete dias são marcadas para revisão. A soma de unidades consumidoras afetadas pode incluir a mesma unidade em mais de um registro.
+
+## Como interpretar as lacunas
+
+- **Conjuntos elétricos.** Um dia com registros exclusivamente programados tem zero interrupções não programadas. Um dia sem registro para o conjunto fica fora da tabela. Códigos de conjunto ausentes ou não positivos entram somente na conferência do total da distribuidora.
+- **Cobertura.** Na extração de 17/11/2026, a série da Copel chega a 30/09, a carga do ONS a 14/11 e o clima a 10/11. Junho de 2025 está sem registros de interrupções da Copel. Junho de 2026 tem cobertura parcial de ocorrências emergenciais. Antes de comparar períodos, consulte `data/processed/cobertura_mensal.parquet`.
+- **Clima e previsão.** As cinco medições paranaenses dão contexto regional. Para usar a reanálise e a carga observada em uma previsão D+1, a modelagem deve respeitar a data em que cada informação ficou disponível.
