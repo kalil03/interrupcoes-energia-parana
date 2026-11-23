@@ -17,6 +17,8 @@ pip install -r requirements.txt
 
 Abra o [notebook da Etapa 2](notebooks/01_preparacao_dados.ipynb), selecione o kernel da `.venv` e execute as células em ordem. A primeira execução baixa os originais para `data/raw/`. As seguintes reutilizam esses arquivos. Os módulos em `src/` fazem a coleta, o tratamento, a integração e as verificações.
 
+Em seguida, abra o [notebook da Etapa 3](notebooks/02_investigacao_sql.ipynb). O foco é saber se as interrupções não programadas da Copel mudaram depois da privatização (agosto de 2023). O notebook consulta os Parquets de `data/processed/` com DuckDB e testa as hipóteses H1 a H4. O código fica em `src/`: `banco.py` (conexão e visões), `consultas.py` (as dez consultas SQL), `testes.py` (testes estatísticos) e `graficos.py`.
+
 ## Bases finais
 
 Os Parquets são gerados localmente em `data/processed/` e ficam fora do Git.
