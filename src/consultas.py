@@ -1,4 +1,11 @@
-"""Consultas SQL da Etapa 3. Cada uma responde a uma pergunta sobre os dados."""
+"""
+Módulo de Consultas Analíticas SQL (DuckDB)
+Projeto Final - Ciência de Dados - UTFPR Câmpus Campo Mourão
+Autores: Kalil, Daniel Suzuki Naves e João Pedro Novais Zanusso
+
+Executa consultas SQL avançadas (CTEs, Window Functions, Agregações Temporais)
+sobre as visões relacionais do DuckDB para investigar as hipóteses H1 a H4 e H_priv.
+"""
 
 CONSULTAS = {}
 
