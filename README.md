@@ -47,3 +47,12 @@ Na ANEEL, removemos duplicatas exatas e preservamos chaves repetidas com conteú
 - **Conjuntos elétricos.** Um dia com registros exclusivamente programados tem zero interrupções não programadas. Um dia sem registro para o conjunto fica fora da tabela. Códigos de conjunto ausentes ou não positivos entram somente na conferência do total da distribuidora.
 - **Cobertura.** Na extração de 17/11/2026, a série da Copel chega a 30/09, a carga do ONS a 14/11 e o clima a 10/11. Junho de 2025 está sem registros de interrupções da Copel. Junho de 2026 tem cobertura parcial de ocorrências emergenciais. Antes de comparar períodos, consulte `data/processed/cobertura_mensal.parquet`.
 - **Clima e previsão.** As cinco medições paranaenses dão contexto regional. Para usar a reanálise e a carga observada em uma previsão D+1, a modelagem deve respeitar a data em que cada informação ficou disponível.
+
+---
+
+## Etapa 3: Integração, Consultas SQL e Análise Exploratória
+
+Nesta etapa, consolidamos o pipeline analítico conectando as bases do ONS, Copel e INMET em visões relacionais no DuckDB:
+* **Visões no DuckDB:** `dia_np` (nível diário estadual) e `micro` (nível regional).
+* **Consultas SQL Analíticas:** Implementação de 5 consultas com CTEs e Window Functions cobrindo perfil de carga (H1), sazonalidade (H2), extremos de vento (H3/H4), impacto da privatização da Copel (H_priv) e vulnerabilidade regional.
+* **Reprodução:** Execute os notebooks `notebooks/01_preparacao_dados.ipynb` e `notebooks/02_investigacao_sql.ipynb`.
